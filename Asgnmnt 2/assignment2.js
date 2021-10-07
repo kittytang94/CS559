@@ -5,19 +5,7 @@ function setup() {
     var context = canvas.getContext('2d');
     canvas.style.background = "powderblue";
 
-    //creates curve using transforms
-    function curveVertexTx(loc, Tx) {
-        var res = vec2.create();
-        vec2.transformMat3(res, loc, Tx);
-        context.curveVertex(res[0], res[1]);
-    }
-
-    //move to a point using transforms
-    function moveToTx(loc, Tx) {
-        var res = vec2.create();
-        vec2.transformMat3(res, loc, Tx);
-        context.moveTo(res[0], res[1]);
-    }
+    requestAnimationFrame(draw);
 
 
     //Path that the wing joints move along
@@ -34,33 +22,38 @@ function setup() {
         context.closePath();
         context.stroke();
     }
-
-
-
+    var xPos = Math.random() * canvas.width;
+    var yPos = Math.random() * canvas.height;
+    var sX = Math.random() * (1.5 - 1) + 1;
+    var sY = Math.random() * (1.5 - 1) + 1 ;
 
     function draw() {
 
         //draws white circle
         function drawCloudpart() {
             context.fillStyle = 'white';
+            var rad = Math.random() * 20;
             context.beginPath();
-            context.arc(0, 0, 20, 0, 2 * Math.PI);
+            context.arc(0, 0, rad, 0, 2 * Math.PI);
             context.fill();
         }
         //picks random coordinate and creates a clump of circles to form cloud
+
         function drawCloud() {
-            context.translate(Math.random() * canvas.width / 2, Math.random() * canvas.height / 2);
+            context.translate(xPos, yPos);
+            context.scale(sX, sY);
             context.save();
-            for (var x = 0; x < 5; x++) {
+            for (var x = 0; x < 100; x++) {
                 var r = Math.PI / 180 * (72 * x);
                 context.translate(25 * Math.cos(r), 10 * Math.sin(r));
                 drawCloudpart();
             }
             context.restore();
+
         }
 
         //draws bird parts
-        function drawBird(radius) {
+        function drawBird() {
             context.lineWidth = 5;
             context.strokeStyle = "black";
             context.moveTo(0, 0);
@@ -70,31 +63,23 @@ function setup() {
             context.stroke();
         }
 
-
-
         //draws on canvas
-        context.save();
-
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.restore();
-                wingRPath();
-        wingLPath();
-        for (var i = 0; i <= 50; i++) {
-            context.scale(Math.random * 5, Math.random * 5);
-            drawCloud();
-            context.restore();
-        }        
-        context.translate(250, 250);
-        drawBird();
-        context.translate(-25, -25);
-        context.scale(2.25, 1);
-        context.rotate(300 * Math.PI / 180);
-        drawBird();
-
-        context.restore();
         context.save();
+        for (var i = 0; i <= 50; i++) {
+            drawCloud();
 
+            //context.scale(Math.random * 100, Math.random * 5);
+        }
 
+        if (yPos % 2 == 1) {
+            context.translate(1, 0);
+        }
+        else
+            context.translate(-1, 0);
+
+        context.restore();
+        //setTimeout(draw, 100);
         window.requestAnimationFrame(draw);
     }
     draw();
