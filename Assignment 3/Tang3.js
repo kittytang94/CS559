@@ -20,15 +20,20 @@ function setup() {
             context.lineTo(res[0], res[1]);
         }
 
-        function drawFish() {
+        function drawFish(Tx) {
             context.lineWidth = 1;
             context.strokeStyle = "black";
-
-
+            context.beginPath();
+            context.moveToTx([0,5], Tx);
+            context.lineToTx([5,7], Tx);
+            context.lineToTx([5,5], Tx);
 
         }
+
+        
     }
-    window.requestAnimationFrame(draw);
+    draw();
+    //window.requestAnimationFrame(draw);
 }
 window.onload = setup;
 
