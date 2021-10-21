@@ -53,6 +53,13 @@ function setup() {
             context.stroke();
         }
 
+        //change y var to move up
+        function animBubble(startPos) {
+        var bubble = mat3.create();
+        mat3.fromTranslation(bubble, startPos);
+        drawBubble(bubble);
+        }
+
         //draws whole fish
         function drawFish(color,Tx) {
             context.beginPath();
@@ -67,12 +74,17 @@ function setup() {
             context.fill();
 
         }
-        var fish1 = mat3.create();
-        mat3.fromTranslation(fish1, [500, 250]);
-        drawFish("blue", fish1);
-        var bubble = mat3.create();
-        mat3.fromTranslation(bubble, [100, 100]);
-        drawBubble(bubble);
+        //change x var to move left/right flipping fish as it changes direction
+        function animFish(color, startPos) {
+            var fish1 = mat3.create();
+            mat3.fromTranslation(fish1, startPos);
+            mat3.scale(fish1, fish1, [-1,1]);
+            drawFish(color, fish1);
+        }
+
+        animFish("blue", [500,250]);
+        animBubble([300,300])
+
     }
     window.requestAnimationFrame(draw);
 }
