@@ -34,7 +34,7 @@ function setup() {
             }
             context.restore();
         }
-        //draws on canvas
+        //draws multiple clouds on canvas
 
         context.save();
         context.translate(100, Math.random() * 10 + 50);
@@ -46,7 +46,7 @@ function setup() {
         drawCloud(); context.translate(-150, 75);
         drawCloud(); context.translate(250, 0);
         drawCloud(); context.restore();
-        
+        //moves clouds left or right depending on xPos value
         if (xPos > canvas.width / 2) {
             context.translate(-1, 0);context.restore();
         } else {
