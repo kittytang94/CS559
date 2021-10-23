@@ -4,8 +4,30 @@ function setup() {
     var context = canvas.getContext('2d');
     canvas.style.background = "powderblue";
 
+    var up = 0;
+    var left = 0;
+    var right = 0;
+
+    var fSchool = [
+        [500, 250], [300, 300], [600, 100],
+        [100, 200], [750, 400], [800, 200],
+        [200, 50], [300, 175], [900, 450],
+        [555, 355], [950, 280]
+    ];
+
+    var bubbles = [
+        [400, 500], [450, 450], [750, 500],
+        [600, 475], [250, 455], [900, 425],
+        [50, 465]
+    ];
+
     function draw() {
-        context.clearRect(0, 0, context.canvas.width, canvas.height);
+        context.clearRect(0, 0, canvas.width, canvas.height);
+
+        up -= 1;
+        left -=1;
+        right +=1;
+
         function moveToTx(loc, Tx) {
             var res = vec2.create();
             vec2.transformMat3(res, loc, Tx);
@@ -47,14 +69,11 @@ function setup() {
             context.closePath();
             context.stroke();
         }
-        function moveUp() {
-
-        }
 
         //change y var to move up
         function animBubble(pos) {
             var bubble = mat3.create();
-            mat3.fromTranslation(bubble, pos);
+            mat3.fromTranslation(bubble, [pos[0], pos[1] + up]);
             drawBubble(bubble);
         }
 
@@ -70,54 +89,42 @@ function setup() {
             lineToTx([35, -10], Tx);
             context.stroke();
             context.fill();
+        }
 
-        }
-        function moveLeft(fish) {
-            var trans = vec2.create();
-        }
-        function moveRight() {
-            var trans = vec2.create();
-
-        }
         //TODO: change x var to move left/right flipping fish as it changes direction
         function animFish(color, pos, dir) {
-            var fish1 = mat3.create();
-            mat3.fromTranslation(fish1, pos);
+            
             //if fish hits side of tank then switch direction
             if (pos[0] == 0 || pos[0] == canvas.width) {
                 dir = !dir;
             }
             if (dir == true) {
+                var fish1 = mat3.create();
+                mat3.fromTranslation(fish1, [pos[0] + right, pos[1]]);
                 mat3.scale(fish1, fish1, [-1, 1]);
-                vec2 translate = vec2()
+                drawFish(color, fish1);
             } else {
-                mat3.scale(fish1, fish1, [1, 1]);
+                var fish1 = mat3.create();
+                mat3.scale(fish1, fish1, [-1, 1]);
+                mat3.fromTranslation(fish1, [pos[0] + left, pos[1]]);
+                drawFish(color, fish1);
             }
-            drawFish(color, fish1);
+            
         }
 
-        var fSchool = [
-          [500, 250],[300, 300], [600, 100], 
-          [100, 200], [750, 400], [800, 200],
-          [200, 50], [300, 175], [900, 450],
-          [555, 355], [950, 280]
-        ];
         for (var i = 0; i < fSchool.length; i++) {
             if (fSchool[i][0] <= 500) {
                 animFish("blue", fSchool[i], true);
-            } else 
-            animFish("red", fSchool[i]);
+            } else
+                animFish("red", fSchool[i]);
         }
-        var bubbles = [
-            [400, 500], [450, 450], [750, 500],
-            [600,475], [250,455], [900, 425],
-            [50, 465]
-        ];
+
         for (var i = 0; i < bubbles.length; i++) {
             animBubble(bubbles[i]);
         }
+        //setInterval(draw, 500);
     }
-    window.requestAnimationFrame(draw);
+    setInterval(draw, 100);
 }
 window.onload = setup;
 
