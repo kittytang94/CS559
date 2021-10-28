@@ -73,8 +73,14 @@ function setup() {
         //change y var to move up
         function animBubble(pos) {
             var bubble = mat3.create();
-            mat3.fromTranslation(bubble, [pos[0], pos[1] + up]);
+            var posY = pos[1] + up;
+            if (posY == -75) {
+                up = 0;
+                posY = 555;
+            }
+            mat3.fromTranslation(bubble, [pos[0], posY]);
             drawBubble(bubble);
+
         }
 
         //draws whole fish
@@ -124,7 +130,7 @@ function setup() {
         }
         //setInterval(draw, 500);
     }
-    setInterval(draw, 100);
+    setInterval(draw, 25);
 }
 window.onload = setup;
 
