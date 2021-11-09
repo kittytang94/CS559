@@ -30,7 +30,6 @@ function setup() {
             context.ellipse(res[0], res[1], xRad, 5, rotation, 0, 2 * Math.PI);
         }
 
-
         function drawHive(Tx) {
             context.lineWidth = 10;
             context.fillStyle = "gold";
@@ -94,13 +93,12 @@ function setup() {
             context.beginPath();
             ellipseTx([7, -10], 12, Tx, 3 * Math.PI / 4);
             context.fill();
-
-
-
         }
         function drawTrajectory(t_begin, t_end, intervals, C, Tx, color) {
             context.strokeStyle = color;
+            context.lineWidth = 2;
             context.beginPath();
+            context.setDashedLine([10, 10]);
             moveToTx(C(t_begin), Tx);
             for (var i = 1; i <= intervals; i++) {
                 var t = ((intervals - i) / intervals) * t_begin + (i / intervals) * t_end;
