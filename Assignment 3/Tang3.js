@@ -4,9 +4,14 @@ function setup() {
     var context = canvas.getContext('2d');
     canvas.style.background = "powderblue";
 
-    var up = 0;
-    var left = 0;
-    var right = 0;
+    var Lfish = document.getElementById('slider1');
+    var LRfish = document.getElementById('slider2');
+    var slideAll = document.getElementById('slider3');
+
+    Lfish.value = 0;
+    LRfish.value = 0;
+    slideAll.value = 0;
+
 
     var fSchool = [
         [500, 250], [300, 300], [600, 100],
@@ -23,10 +28,9 @@ function setup() {
 
     function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-
-        up -= 1;
-        left -=1;
-        right +=1;
+        // up -= 1;
+        // left -=1;
+        // right +=1;
 
         function moveToTx(loc, Tx) {
             var res = vec2.create();
@@ -128,9 +132,8 @@ function setup() {
         for (var i = 0; i < bubbles.length; i++) {
             animBubble(bubbles[i]);
         }
-        //setInterval(draw, 500);
     }
-    setInterval(draw, 25);
+    draw();
 }
 window.onload = setup;
 
