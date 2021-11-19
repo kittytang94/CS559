@@ -5,12 +5,12 @@ function setup() {
     canvas.style.background = "powderblue";
 
     var Lfish = document.getElementById('slider1');
-    var LRfish = document.getElementById('slider2');
-    var slideAll = document.getElementById('slider3');
+    var LandRfish = document.getElementById('slider2');
+    var up = 0;
 
     Lfish.value = 0;
-    LRfish.value = 0;
-    slideAll.value = 0;
+    LandRfish.value = 0;
+
 
 
     var fSchool = [
@@ -20,17 +20,24 @@ function setup() {
         [555, 355], [950, 280]
     ];
 
-    var bubbles = [
-        [400, 500], [450, 450], [750, 500],
-        [600, 475], [250, 455], [900, 425],
-        [50, 465]
-    ];
+    // var bubbles = [
+    //     [400, 500], [450, 450], [750, 500],
+    //     [600, 475], [250, 455], [900, 425],
+    //     [50, 465], [100, 450], [500, 500],
+    //     [700, 450], [950, 475]
+    // ];
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
 
     function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
-        // up -= 1;
-        // left -=1;
-        // right +=1;
+
+        up -= 1;
+
+        var stack = [mat3.create()];
+        function save() { stack.unshift(mat3.clone(stack[0])); }
+        function restore() { stack.shift(); }
 
         function moveToTx(loc, Tx) {
             var res = vec2.create();
@@ -74,19 +81,6 @@ function setup() {
             context.stroke();
         }
 
-        //change y var to move up
-        function animBubble(pos) {
-            var bubble = mat3.create();
-            var posY = pos[1] + up;
-            if (posY == -75) {
-                up = 0;
-                posY = 555;
-            }
-            mat3.fromTranslation(bubble, [pos[0], posY]);
-            drawBubble(bubble);
-
-        }
-
         //draws whole fish
         function drawFish(color, Tx) {
             context.beginPath();
@@ -100,40 +94,38 @@ function setup() {
             context.stroke();
             context.fill();
         }
+        function flipFish(Tx) {
+            mat3.scale(Tx, Tx, [-1, 1]);
+        }
 
-        //TODO: change x var to move left/right flipping fish as it changes direction
-        function animFish(color, pos, dir) {
-            
-            //if fish hits side of tank then switch direction
-            if (pos[0] == 0 || pos[0] == canvas.width) {
-                dir = !dir;
-            }
-            if (dir == true) {
-                var fish1 = mat3.create();
-                mat3.fromTranslation(fish1, [pos[0] + right, pos[1]]);
-                mat3.scale(fish1, fish1, [-1, 1]);
-                drawFish(color, fish1);
-            } else {
-                var fish1 = mat3.create();
-                mat3.scale(fish1, fish1, [-1, 1]);
-                mat3.fromTranslation(fish1, [pos[0] + left, pos[1]]);
-                drawFish(color, fish1);
-            }
-            
+
+        //change y var to move up
+        function animBubble(pos) {
+            var bubble = mat3.create();
+            mat3.fromTranslation(bubble, [pos[0], pos[1] + up]);
+            drawBubble(bubble);
         }
 
         for (var i = 0; i < fSchool.length; i++) {
             if (fSchool[i][0] <= 500) {
-                animFish("blue", fSchool[i], true);
+                animLFish("blue", fSchool[i], true);
             } else
-                animFish("red", fSchool[i]);
+                animLRFish("red", fSchool[i]);
+
         }
+        var bubbles = [];
+        for (var i = 0; i < 20; i++) {
+            bubbles[i] = mat3.create();
+        }
+
 
         for (var i = 0; i < bubbles.length; i++) {
             animBubble(bubbles[i]);
         }
     }
-    draw();
+    Lfish.addEventListener("input", draw);
+    LandRfish.addEventListener("input", draw);
+    setInterval(draw, 35)
 }
 window.onload = setup;
 
