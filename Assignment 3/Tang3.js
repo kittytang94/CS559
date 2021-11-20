@@ -4,14 +4,8 @@ function setup() {
     var context = canvas.getContext('2d');
     canvas.style.background = "powderblue";
 
-    var Lfish = document.getElementById('slider1');
-    var LandRfish = document.getElementById('slider2');
-    var up = 0;
-
-    Lfish.value = 0;
-    LandRfish.value = 0;
-
-
+    var neg = 0;
+    var plus = 0;
 
     var fSchool = [
         [500, 250], [300, 300], [600, 100],
@@ -20,20 +14,18 @@ function setup() {
         [555, 355], [950, 280]
     ];
 
-    // var bubbles = [
-    //     [400, 500], [450, 450], [750, 500],
-    //     [600, 475], [250, 455], [900, 425],
-    //     [50, 465], [100, 450], [500, 500],
-    //     [700, 450], [950, 475]
-    // ];
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * max);
-    }
+    var bubblesPos = [
+        [400, 500], [450, 450], [750, 500],
+        [600, 475], [250, 455], [900, 425],
+        [50, 465], [100, 450], [500, 500],
+        [700, 450], [950, 475]
+    ];
 
     function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        up -= 1;
+        neg -= 1;
+        plus +=1;
 
         var stack = [mat3.create()];
         function save() { stack.unshift(mat3.clone(stack[0])); }
@@ -98,34 +90,50 @@ function setup() {
             mat3.scale(Tx, Tx, [-1, 1]);
         }
 
-
         //change y var to move up
-        function animBubble(pos) {
-            var bubble = mat3.create();
-            mat3.fromTranslation(bubble, [pos[0], pos[1] + up]);
-            drawBubble(bubble);
+        function animBubble(obj) {
+            for (var i = 0; i < bubblesPos.length; i++) {
+                save();
+                mat3.fromTranslation(obj, [bubblesPos[i][0], bubblesPos[i][1] + neg]);
+                drawBubble(obj);
+                restore();
+            }
         }
 
-        for (var i = 0; i < fSchool.length; i++) {
-            if (fSchool[i][0] <= 500) {
-                animLFish("blue", fSchool[i], true);
-            } else
-                animLRFish("red", fSchool[i]);
-
+        function animFish(obj) {
+            for(var i = 0; i < fSchool.length; i++) {
+                if(fSchool[i][0] < canvas.width/2) {
+                    save();
+                    mat3.fromTranslation(obj, [fSchool[i][0] + plus, fSchool[i][1]]);
+                    flipFish(obj);
+                    drawFish("blue", obj);
+                    restore();
+                } else {
+                    save();
+                    mat3.fromTranslation(obj, [fSchool[i][0] + neg, fSchool[i][1]]);
+                    drawFish("red", obj);
+                    restore();
+                }
+            }
+        }
+        var fish = [];
+        for (var i = 0; i <= 20; i++) {
+            fish[i] = mat3.create();
         }
         var bubbles = [];
-        for (var i = 0; i < 20; i++) {
+        for (var i = 0; i <= 20; i++) {
             bubbles[i] = mat3.create();
         }
-
 
         for (var i = 0; i < bubbles.length; i++) {
             animBubble(bubbles[i]);
         }
+        for(var i = 0; i < fish.length; i++) {
+            animFish(fish[i]);
+         }
     }
-    Lfish.addEventListener("input", draw);
-    LandRfish.addEventListener("input", draw);
-    setInterval(draw, 35)
+
+    setInterval(draw, 35);
 }
 window.onload = setup;
 
