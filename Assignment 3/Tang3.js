@@ -3,16 +3,16 @@ function setup() {
     var canvas = document.getElementById('Tang3');
     var context = canvas.getContext('2d');
     canvas.style.background = "powderblue";
+    
+    var slider1 = document.getElementById('slider1');
+    var slider2 = document.getElementById('slider2');
+    var slider3 = document.getElementById('slider3');
+    var slider4 = document.getElementById('slider4');
 
-    var neg = 0;
-    var plus = 0;
-
-    var fSchool = [
-        [500, 250], [300, 300], [600, 100],
-        [100, 200], [750, 400], [800, 200],
-        [200, 50], [300, 175], [900, 450],
-        [555, 355], [950, 280]
-    ];
+    slider1.value = 0;
+    slider2.value = 0;
+    slider3.value = 0;
+    slider4.value = 0;
 
     var bubblesPos = [
         [400, 500], [450, 450], [750, 500],
@@ -24,116 +24,113 @@ function setup() {
     function draw() {
         context.clearRect(0, 0, canvas.width, canvas.height);
 
-        neg -= 1;
-        plus +=1;
-
         var stack = [mat3.create()];
         function save() { stack.unshift(mat3.clone(stack[0])); }
         function restore() { stack.shift(); }
 
-        function moveToTx(loc, Tx) {
+        function moveToTx(loc) {
             var res = vec2.create();
-            vec2.transformMat3(res, loc, Tx);
+            vec2.transformMat3(res, loc, stack[0]);
             context.moveTo(res[0], res[1]);
         }
-        function lineToTx(loc, Tx) {
+        function lineToTx(loc) {
             var res = vec2.create();
-            vec2.transformMat3(res, loc, Tx);
+            vec2.transformMat3(res, loc, stack[0]);
             context.lineTo(res[0], res[1]);
         }
         //draws ellipse
-        function ellipseTx(loc, Tx) {
+        function ellipseTx(loc) {
             var res = vec2.create();
-            vec2.transformMat3(res, loc, Tx);
+            vec2.transformMat3(res, loc, stack[0]);
             context.ellipse(res[0], res[1], 20, 10, 0, 0, 2 * Math.PI);
         }
         //draws cirle
-        function arcTx(rad, loc, Tx) {
+        function arcTx(rad, loc) {
             var res = vec2.create();
-            vec2.transformMat3(res, loc, Tx);
+            vec2.transformMat3(res, loc, stack[0]);
             context.arc(res[0], res[1], rad, 0, 2 * Math.PI);
         }
         //draw bubble
-        function drawBubble(Tx) {
+        function drawBubble() {
             context.strokeStyle = "white";
-            moveToTx([0, 0], Tx);
+            moveToTx([0, 0]);
             context.beginPath();
-            arcTx(20, [0, 0], Tx);
+            arcTx(20, [0, 0]);
             context.closePath();
             context.stroke();
-            moveToTx([7, -9], Tx);
+            moveToTx([7, -9]);
             context.beginPath();
-            arcTx(2, [7, -9], Tx);
+            arcTx(2, [7, -9]);
             context.closePath();
             context.stroke();
-            moveToTx([10, -5], Tx);
+            moveToTx([10, -5]);
             context.beginPath();
-            arcTx(2, [10, -5], Tx);
+            arcTx(2, [10, -5]);
             context.closePath();
             context.stroke();
         }
 
         //draws whole fish
-        function drawFish(color, Tx) {
+        function drawFish(color) {
             context.beginPath();
             context.fillStyle = color;
             context.strokeStyle = color;
-            moveToTx([0, 0], Tx);
-            ellipseTx([0, 0], Tx);
-            moveToTx([20, 0], Tx);
-            lineToTx([30, 10], Tx);
-            lineToTx([35, -10], Tx);
+            moveToTx([0, 0]);
+            ellipseTx([0, 0]);
+            moveToTx([20, 0]);
+            lineToTx([30, 10]);
+            lineToTx([35, -10]);
             context.stroke();
             context.fill();
         }
-        function flipFish(Tx) {
-            mat3.scale(Tx, Tx, [-1, 1]);
+        function flipFish(fish) {
+            mat3.scale(fish, fish, [-1,1]);
         }
 
-        //change y var to move up
-        function animBubble(obj) {
-            for (var i = 0; i < bubblesPos.length; i++) {
-                save();
-                mat3.fromTranslation(obj, [bubblesPos[i][0], bubblesPos[i][1] + neg]);
-                drawBubble(obj);
-                restore();
-            }
-        }
+        var oneFish = mat3.create();
+        mat3.fromTranslation(oneFish, [250,250]);
+        mat3.multiply(stack[0],stack[0],oneFish);
+        drawFish("red");
 
-        function animFish(obj) {
-            for(var i = 0; i < fSchool.length; i++) {
-                if(fSchool[i][0] < canvas.width/2) {
-                    save();
-                    mat3.fromTranslation(obj, [fSchool[i][0] + plus, fSchool[i][1]]);
-                    flipFish(obj);
-                    drawFish("blue", obj);
-                    restore();
-                } else {
-                    save();
-                    mat3.fromTranslation(obj, [fSchool[i][0] + neg, fSchool[i][1]]);
-                    drawFish("red", obj);
-                    restore();
-                }
-            }
-        }
-        var fish = [];
-        for (var i = 0; i <= 20; i++) {
-            fish[i] = mat3.create();
-        }
-        var bubbles = [];
-        for (var i = 0; i <= 20; i++) {
-            bubbles[i] = mat3.create();
-        }
+        save();
+        var twoFish = mat3.create();
+        mat3.fromTranslation(twoFish, [50,50]);
+        mat3.translate(twoFish, twoFish, [slider1.value, 0]);
+        flipFish(twoFish);
+        mat3.multiply(stack[0], stack[0], twoFish);
+        drawFish("blue");
 
-        for (var i = 0; i < bubbles.length; i++) {
-            animBubble(bubbles[i]);
-        }
-        for(var i = 0; i < fish.length; i++) {
-            animFish(fish[i]);
-         }
+        save();
+        var dumbFish = mat3.create();
+        mat3.fromTranslation(dumbFish, [-200,-90]);
+        mat3.translate(dumbFish,dumbFish, [slider2.value, 0]);
+        mat3.multiply(stack[0],stack[0], dumbFish);
+        drawFish("green");
+
+        save();
+        var littleFish = mat3.create();
+        mat3.fromTranslation(littleFish, [-200,50]);
+        mat3.translate(littleFish,littleFish, [slider3.value, 0]);
+        mat3.multiply(stack[0],stack[0], littleFish);
+        drawFish("purple");
+        restore();
+        restore();
+        restore();
+
+        save();
+        var bubble = mat3.create();
+        mat3.fromTranslation(bubble, [-50,50]);
+        mat3.translate(bubble, bubble, [0, slider4.value]);
+        mat3.multiply(stack[0], stack[0], bubble);
+        drawBubble();
+        restore();
     }
 
-    setInterval(draw, 35);
+    slider1.addEventListener("input",draw);
+    slider2.addEventListener("input",draw);
+    slider3.addEventListener("input",draw);
+    slider4.addEventListener("input",draw);
+    draw();
 }
 window.onload = setup;
 
